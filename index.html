@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hôpital Publique French Capital — Urgences</title>
+  <meta name="description" content="Admissions, identité complète, ATCD, IAO, consultation, soins, examens, décision, compte rendu." />
+  <style>
+    :root{
+      --bg:#08101f; --panel:#0c1933; --panel2:#0a142a;
+      --text:#eef3ff; --muted:#b8c3e6;
+      --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+      --accent:#4ea3ff; --accent2:#7cf0c5;
+      --warn:#ffcc66; --danger:#ff6b6b; --ok:#7cf0c5;
+      --shadow:0 14px 40px rgba(0,0,0,.38);
+      --radius:16px; --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      --sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0;font-family:var(--sans);color:var(--text);
+      background:
+        radial-gradient(1200px 500px at 12% 0%, rgba(78,163,255,.18), transparent 60%),
+        radial-gradient(900px 500px at 88% 8%, rgba(124,240,197,.10), transparent 55%),
+        radial-gradient(900px 600px at 40% 120%, rgba(255,204,102,.07), transparent 58%),
+        var(--bg);
+    }
+    .app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+    @media (max-width:1100px){.app{grid-template-columns:1fr}}
+    .sidebar{
+      position:sticky;top:0;height:100vh;padding:20px 16px;
+      background:linear-gradient(180deg, rgba(12,25,51,.92), rgba(10,20,42,.92));
+      border-right:1px solid var(--line);backdrop-filter:blur(10px);overflow:auto;
+    }
+    @media (max-width:1100px){.sidebar{position:relative;height:auto}}
+    .brand{
+      display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);
+      border-radius:var(--radius);background:rgba(0,0,0,.16);box-shadow:var(--shadow);
+    }
+    .logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#071127;
+      background:linear-gradient(135deg,var(--accent),rgba(124,240,197,.65));
+    }
+    .brand h1{margin:0;font-size:14px}
+    .brand p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.25}
+    .block{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(0,0,0,.12)}
+    .block h2{margin:0 0 8px;font-size:12px;letter-spacing:.35px;text-transform:uppercase;color:rgba(238,243,255,.92)}
+    .field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    .field input,.field textarea,.field select{
+      width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.06);color:var(--text);outline:none;resize:vertical;
+    }
+    .field textarea{min-height:86px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .nav{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .nav button{
+      width:100%;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(0,0,0,.10);color:var(--text);cursor:pointer;transition:.15s ease;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .nav button:hover{transform:translateY(-1px);background:rgba(255,255,255,.06)}
+    .nav button.active{background:rgba(78,163,255,.18);border-color:rgba(78,163,255,.35);box-shadow:0 10px 30px rgba(78,163,255,.10)}
+    .badge{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:rgba(255,255,255,.04)}
+    .hint{margin-top:12px;padding:12px;border-radius:var(--radius);border:1px dashed rgba(255,255,255,.22);color:var(--muted);font-size:12px;line-height:1.35;background:rgba(0,0,0,.10)}
+    .main{padding:20px 20px 50px;min-width:0}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+    .title h2{margin:0;font-size:18px}
+    .title p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(0,0,0,.10);color:var(--text);cursor:pointer;transition:.15s ease;
+      display:inline-flex;gap:10px;align-items:center;user-select:none;white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.06)}
+    .btn.primary{background:rgba(124,240,197,.14);border-color:rgba(124,240,197,.35)}
+    .btn.warn{background:rgba(255,204,102,.12);border-color:rgba(255,204,102,.30)}
+    .btn.danger{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.30)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .row2{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
+    @media (max-width:1100px){.row2{grid-template-columns:1fr}}
+    .card{border:1px solid var(--line);background:rgba(0,0,0,.12);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-width:0}
+    .card .hd{padding:14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    }
+    .card .hd h3{margin:0;font-size:14px}
+    .card .hd p{margin:4px 0 0;font-size:12px;color:var(--muted);line-height:1.35}
+    .card .bd{padding:14px}
+    .sep{height:1px;background:var(--line);margin:12px 0}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-size:12px;color:var(--muted);text-align:left;font-weight:600}
+    tr:hover td{background:rgba(255,255,255,.03)}
+    .mono{font-family:var(--mono)}
+    .small{font-size:12px}
+    .muted{color:var(--muted)}
+    .pill{
+      font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);color:var(--muted);display:inline-flex;gap:6px;align-items:center;white-space:nowrap;
+    }
+    .pill.ok{border-color:rgba(124,240,197,.35);background:rgba(124,240,197,.10);color:#d7fff2}
+    .pill.warn{border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.10);color:#fff1d0}
+    .pill.danger{border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.10);color:#ffd6d6}
+    .pill.info{border-color:rgba(78,163,255,.35);background:rgba(78,163,255,.10);color:#d9ecff}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+    .tab{padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.10);cursor:pointer;font-size:12px;transition:.15s ease}
+    .tab:hover{background:rgba(255,255,255,.06);transform:translateY(-1px)}
+    .tab.active{border-color:rgba(78,163,255,.35);background:rgba(78,163,255,.14);box-shadow:0 10px 25px rgba(78,163,255,.08)}
+    section[data-page]{display:none} section[data-page].show{display:block}
+    .subsection{display:none} .subsection.show{display:block}
+    .note{font-size:12px;color:var(--muted);line-height:1.35;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:10px 12px;border-radius:14px}
+    /* Modal */
+    .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000}
+    .modalBack.show{display:flex}
+    .modal{width:min(920px,100%);border-radius:var(--radius);border:1px solid var(--line2);
+      background:linear-gradient(180deg, rgba(12,25,51,.98), rgba(10,20,42,.98));box-shadow:var(--shadow);overflow:hidden}
+    .modal .mh{padding:14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .modal .mh h3{margin:0;font-size:14px}
+    .modal .mh p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .modal .mb{padding:14px}
+    .modal .mf{padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">HP</div>
+      <div>
+        <h1>Hôpital Publique French Capital</h1>
+        <p>Urgences • Admissions • IAO • Consultation • Soins • Examens • Sortie</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Session</h2>
+      <div class="field">
+        <label>Nom / Identifiant</label>
+        <input id="userName" placeholder="Ex : Dr Dupont / IDE Martin" />
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>Rôle</label>
+        <select id="userRole">
+          <option value="ADMIN">Cadre / Administration</option>
+          <option value="MD">Médecin</option>
+          <option value="IAO">IAO</option>
+          <option value="IDE">Infirmier(ère)</option>
+        </select>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" id="btnLogin">Ouvrir session</button>
+        <button class="btn" id="btnLogout">Fermer</button>
+      </div>
+      <div class="sep"></div>
+      <div class="note" id="authInfo">Aucune session ouverte.</div>
+    </div>
+
+    <div class="block">
+      <h2>Recherche</h2>
+      <div class="field">
+        <label>Patient / motif / id</label>
+        <input id="q" placeholder="Tape pour filtrer..." />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <label>Statut</label>
+          <select id="fStatus">
+            <option value="">Tous</option>
+            <option value="En attente">En attente</option>
+            <option value="En cours">En cours</option>
+            <option value="Surveillance">Surveillance</option>
+            <option value="Hospitalisé">Hospitalisé</option>
+            <option value="Transfert">Transfert</option>
+            <option value="Sortie">Sortie</option>
+            <option value="Décédé">Décédé</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>IAO</label>
+          <select id="fIAO">
+            <option value="">Tous</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Navigation">
+      <button class="active" data-nav="dashboard">Tableau de bord <span class="badge" id="badgeQueue">0</span></button>
+      <button data-nav="admission">Admission <span class="badge">Entrée</span></button>
+      <button data-nav="patient">Dossier patient <span class="badge">Fiche</span></button>
+      <button data-nav="audit">Journal (Audit) <span class="badge">Local</span></button>
+      <button data-nav="settings">Paramètres <span class="badge">Local</span></button>
+    </nav>
+
+    <div class="hint">
+      Données enregistrées en local (sur l’appareil).<br/>
+      Pour un vrai multi-personnel partagé : Google Forms/Sheets ou Apps Script.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="title">
+        <h2 id="pageTitle">Tableau de bord</h2>
+        <p id="pageSub">Suivi opérationnel du service des urgences</p>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnNew">+ Nouveau patient</button>
+        <button class="btn" id="btnExport">Exporter</button>
+        <button class="btn warn" id="btnImport">Importer</button>
+        <button class="btn danger" id="btnReset">Réinitialiser</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section data-page="dashboard" class="show">
+      <div class="row2">
+        <div class="card">
+          <div class="hd">
+            <div>
+              <h3>File active</h3>
+              <p>Liste patients, triage, alertes, accès dossier.</p>
+            </div>
+            <span class="pill mono" id="countPill">0 patient</span>
+          </div>
+          <div class="bd">
+            <table>
+              <thead>
+              <tr>
+                <th>Heure</th><th>Identité</th><th>Motif</th><th>IAO</th><th>Box</th><th>Statut</th>
+              </tr>
+              </thead>
+              <tbody id="tblPatients"><tr><td colspan="6" class="muted">Aucun patient.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>
+              <h3>Patient sélectionné</h3>
+              <p>Synthèse et actions.</p>
+            </div>
+            <span class="pill" id="selPill">Aucun</span>
+          </div>
+          <div class="bd">
+            <div class="note" id="selSummary">Aucun patient sélectionné.</div>
+            <div class="sep"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn primary" id="btnGoPatient">Ouvrir dossier</button>
+              <button class="btn" id="btnSetStatus">Changer statut</button>
+              <button class="btn danger" id="btnClose">Clôturer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMISSION -->
+    <section data-page="admission">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <h3>Admission (Identité complète)</h3>
+            <p>Création du dossier : identité, coordonnées, ATCD, allergies, traitement habituel.</p>
+          </div>
+          <span class="pill info">Entrée</span>
+        </div>
+        <div class="bd">
+          <form id="formAdmission">
+            <div class="row3">
+              <div class="field"><label>Heure d’arrivée</label><input name="arrivalTime" placeholder="HH:MM" required></div>
+              <div class="field"><label>Box</label><input name="box" placeholder="Ex : Box 3"></div>
+              <div class="field"><label>Mode d’arrivée</label><input name="arrivalMode" placeholder="Domicile / SMUR / VSAV / Police"></div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row3">
+              <div class="field"><label>Nom</label><input name="nom" required></div>
+              <div class="field"><label>Prénom</label><input name="prenom" required></div>
+              <div class="field"><label>Date de naissance</label><input name="ddn" placeholder="JJ/MM/AAAA" required></div>
+            </div>
+
+            <div class="row3" style="margin-top:10px">
+              <div class="field"><label>Âge</label><input name="age" type="number" min="0" max="120" required></div>
+              <div class="field"><label>Sexe</label>
+                <select name="sexe" required><option value="">—</option><option>H</option><option>F</option><option>Autre</option></select>
+              </div>
+              <div class="field"><label>Téléphone</label><input name="tel" placeholder="06..." /></div>
+            </div>
+
+            <div class="field" style="margin-top:10px"><label>Adresse</label><input name="adresse" placeholder="Rue, ville"></div>
+
+            <div class="row" style="margin-top:10px">
+              <div class="field"><label>Personne à prévenir</label><input name="contact" placeholder="Nom + tel"></div>
+              <div class="field"><label>Médecin traitant</label><input name="medecin" placeholder="Nom"></div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="field"><label>Motif de recours</label><input name="motif" required></div>
+            <div class="field" style="margin-top:10px"><label>Commentaire d’entrée</label><textarea name="commentaire"></textarea></div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <div class="field"><label>Antécédents médicaux</label><textarea name="atcdMed" placeholder="Ex : TVP, asthme, diabète..."></textarea></div>
+              <div class="field"><label>Antécédents chirurgicaux</label><textarea name="atcdChir"></textarea></div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <div class="field"><label>Allergies</label><textarea name="allergies" placeholder="Ex : pénicilline"></textarea></div>
+              <div class="field"><label>Traitement habituel</label><textarea name="traitements" placeholder="Ex : apixaban 5 mg x2/j"></textarea></div>
+            </div>
+
+            <div class="sep"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn primary" type="submit">Créer dossier</button>
+              <button class="btn" type="button" id="btnClearAdm">Vider</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- PATIENT -->
+    <section data-page="patient">
+      <div class="card">
+        <div class="hd">
+          <div>
+            <h3>Dossier patient</h3>
+            <p>IAO • Consultation • Soins • Examens • Sortie • Compte rendu</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill" id="pNamePill">Aucun</span>
+            <span class="pill mono" id="pIdPill">—</span>
+            <span class="pill" id="pStatusPill">—</span>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="note" id="pBanner">Sélectionne un patient depuis le tableau de bord.</div>
+
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="fiche">Fiche</div>
+            <div class="tab" data-tab="iao">IAO</div>
+            <div class="tab" data-tab="consult">Consultation</div>
+            <div class="tab" data-tab="soins">Soins</div>
+            <div class="tab" data-tab="examens">Examens</div>
+            <div class="tab" data-tab="sortie">Sortie</div>
+            <div class="tab" data-tab="cr">Compte rendu</div>
+          </div>
+
+          <div class="sep"></div>
+
+          <!-- FICHE -->
+          <div class="subsection show" data-sub="fiche">
+            <div class="row3">
+              <div class="field"><label>Nom</label><input id="pfNom"></div>
+              <div class="field"><label>Prénom</label><input id="pfPrenom"></div>
+              <div class="field"><label>Date de naissance</label><input id="pfDDN"></div>
+            </div>
+            <div class="row3" style="margin-top:10px">
+              <div class="field"><label>Âge</label><input id="pfAge" type="number"></div>
+              <div class="field"><label>Sexe</label>
+                <select id="pfSexe"><option>H</option><option>F</option><option>Autre</option></select>
+              </div>
+              <div class="field"><label>Téléphone</label><input id="pfTel"></div>
+            </div>
+            <div class="field" style="margin-top:10px"><label>Adresse</label><input id="pfAdresse"></div>
+            <div class="row" style="margin-top:10px">
+              <div class="field"><label>Personne à prévenir</label><input id="pfContact"></div>
+              <div class="field"><label>Médecin traitant</label><input id="pfMedecin"></div>
+            </div>
+            <div class="sep"></div>
+            <div class="row3">
+              <div class="field"><label>Arrivée</label><input id="pfArrivee"></div>
+              <div class="field"><label>Mode arrivée</label><input id="pfMode"></div>
+              <div class="field"><label>Box</label><input id="pfBox"></div>
+            </div>
+            <div class="sep"></div>
+            <div class="field"><label>Motif de recours</label><input id="pfMotif"></div>
+            <div class="field" style="margin-top:10px"><label>Commentaire d’entrée</label><textarea id="pfCommentaire"></textarea></div>
+            <div class="sep"></div>
+            <div class="row">
+              <div class="field"><label>ATCD médicaux</label><textarea id="pfATCDMed"></textarea></div>
+              <div class="field"><label>ATCD chirurgicaux</label><textarea id="pfATCDChir"></textarea></div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <div class="field"><label>Allergies</label><textarea id="pfAllergies"></textarea></div>
+              <div class="field"><label>Traitement habituel</label><textarea id="pfTTT"></textarea></div>
+            </div>
+            <div class="sep"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+              <button class="btn primary" id="btnSaveFiche">Enregistrer fiche</button>
+            </div>
+          </div>
+
+          <!-- IAO -->
+          <div class="subsection" data-sub="iao">
+            <form id="formIAO">
+              <div class="row3">
+                <div class="field"><label>Heure</label><input name="time" placeholder="HH:MM" required></div>
+                <div class="field"><label>Niveau IAO (1–5)</label><input name="level" type="number" min="1" max="5" required></div>
+                <div class="field"><label>EVA (/10)</label><input name="eva" placeholder="7"></div>
+              </div>
+              <div class="sep"></div>
+              <div class="row3">
+                <div class="field"><label>TA</label><input name="ta" placeholder="134/82"></div>
+                <div class="field"><label>FC</label><input name="fc" placeholder="90"></div>
+                <div class="field"><label>FR</label><input name="fr" placeholder="18"></div>
+              </div>
+              <div class="row3" style="margin-top:10px">
+                <div class="field"><label>SpO₂</label><input name="spo2" placeholder="98"></div>
+                <div class="field"><label>T°</label><input name="temp" placeholder="36.7"></div>
+                <div class="field"><label>Actions IAO</label><input name="actions" placeholder="Bracelet, constantes, voie veineuse..."></div>
+              </div>
+              <div class="field" style="margin-top:10px"><label>Commentaire IAO</label><textarea name="comment"></textarea></div>
+              <div class="sep"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Enregistrer IAO</button>
+              </div>
+            </form>
+            <div class="sep"></div>
+            <div class="note" id="iaoLast">Aucune IAO enregistrée.</div>
+          </div>
+
+          <!-- CONSULT -->
+          <div class="subsection" data-sub="consult">
+            <form id="formConsult">
+              <div class="row3">
+                <div class="field"><label>Heure</label><input name="time" placeholder="HH:MM" required></div>
+                <div class="field"><label>Hypothèse principale</label><input name="dx1" placeholder="Ex : fracture ouverte tibia"></div>
+                <div class="field"><label>Différentiels</label><input name="ddx"></div>
+              </div>
+              <div class="sep"></div>
+              <div class="field"><label>Histoire de la maladie (HMA)</label><textarea name="hma"></textarea></div>
+              <div class="field" style="margin-top:10px"><label>Examen clinique</label><textarea name="exam"></textarea></div>
+              <div class="field" style="margin-top:10px"><label>Plan / conduite à tenir</label><textarea name="plan"></textarea></div>
+              <div class="sep"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Enregistrer consultation</button>
+              </div>
+            </form>
+            <div class="sep"></div>
+            <div class="note" id="consultLast">Aucune consultation enregistrée.</div>
+          </div>
+
+          <!-- SOINS -->
+          <div class="subsection" data-sub="soins">
+            <form id="formSoins">
+              <div class="row3">
+                <div class="field"><label>Heure</label><input name="time" placeholder="HH:MM" required></div>
+                <div class="field"><label>Type</label>
+                  <select name="type"><option>Soins</option><option>Médicament</option><option>Surveillance</option></select>
+                </div>
+                <div class="field"><label>Acte</label><input name="act" placeholder="Ex : pansement stérile"></div>
+              </div>
+              <div class="field" style="margin-top:10px"><label>Détails</label><textarea name="details"></textarea></div>
+              <div class="sep"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Tracer</button>
+              </div>
+            </form>
+            <div class="sep"></div>
+            <div class="note" id="soinsList">Aucun soin.</div>
+          </div>
+
+          <!-- EXAMENS -->
+          <div class="subsection" data-sub="examens">
+            <form id="formExamens">
+              <div class="row3">
+                <div class="field"><label>Heure</label><input name="time" placeholder="HH:MM" required></div>
+                <div class="field"><label>Type</label>
+                  <select name="type" required>
+                    <option value="">—</option>
+                    <option>Biologie</option><option>ECG</option><option>Radiographie</option><option>Scanner</option><option>Échographie</option><option>Autre</option>
+                  </select>
+                </div>
+                <div class="field"><label>Conclusion</label><input name="conclu" placeholder="Ex : normal / fracture..."></div>
+              </div>
+              <div class="field" style="margin-top:10px"><label>Résultat détaillé</label><textarea name="result"></textarea></div>
+              <div class="sep"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Ajouter examen</button>
+              </div>
+            </form>
+            <div class="sep"></div>
+            <div class="note" id="examensList">Aucun examen.</div>
+          </div>
+
+          <!-- SORTIE -->
+          <div class="subsection" data-sub="sortie">
+            <form id="formSortie">
+              <div class="row3">
+                <div class="field"><label>Heure</label><input name="time" placeholder="HH:MM" required></div>
+                <div class="field"><label>Orientation</label>
+                  <select name="orientation"><option>Sortie externe</option><option>Hospitalisation</option><option>Transfert</option><option>Surveillance</option></select>
+                </div>
+                <div class="field"><label>Statut</label>
+                  <select name="status"><option>Sortie</option><option>En cours</option><option>Hospitalisé</option><option>Transfert</option><option>Décédé</option></select>
+                </div>
+              </div>
+              <div class="sep"></div>
+              <div class="field"><label>Diagnostic principal</label><textarea name="dxMain"></textarea></div>
+              <div class="field" style="margin-top:10px"><label>Diagnostics complémentaires</label><textarea name="dxComp"></textarea></div>
+              <div class="field" style="margin-top:10px"><label>Conclusion</label><textarea name="conclusion"></textarea></div>
+              <div class="field" style="margin-top:10px"><label>Conseils / surveillance</label><textarea name="advice"></textarea></div>
+              <div class="sep"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Enregistrer sortie</button>
+                <button class="btn danger" type="button" id="btnCloseCase">Clôturer dossier</button>
+              </div>
+            </form>
+            <div class="sep"></div>
+            <div class="note" id="sortieLast">Aucune sortie enregistrée.</div>
+          </div>
+
+          <!-- CR -->
+          <div class="subsection" data-sub="cr">
+            <div class="note" id="crOut">Clique “Générer CR” pour afficher le compte rendu.</div>
+            <div class="sep"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+              <button class="btn primary" id="btnGenCR">Générer CR</button>
+              <button class="btn" id="btnCopyCR">Copier</button>
+              <button class="btn" id="btnDlCR">Télécharger .txt</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIT -->
+    <section data-page="audit">
+      <div class="card">
+        <div class="hd">
+          <div><h3>Journal (Audit)</h3><p>Traçabilité locale des actions.</p></div>
+          <span class="pill mono" id="auditCount">0</span>
+        </div>
+        <div class="bd">
+          <div class="note" id="auditList">Aucun événement.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section data-page="settings">
+      <div class="card">
+        <div class="hd"><div><h3>Paramètres</h3><p>Local : seuils et gestion.</p></div></div>
+        <div class="bd">
+          <div class="note">Ce mode HTML = local. Google Sites peut limiter certaines fonctions.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modalBack" id="modalBack" aria-hidden="true">
+  <div class="modal">
+    <div class="mh">
+      <div><h3 id="mTitle">—</h3><p id="mSub">—</p></div>
+      <button class="btn" id="mClose">Fermer</button>
+    </div>
+    <div class="mb" id="mBody"></div>
+    <div class="mf" id="mFooter"></div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = "hpfc_html_only_v1";
+  const SESSION_KEY = "hpfc_html_session_v1";
+
+  const state = loadState() || { patients: [], audit: [] };
+  let session = loadSession() || { open:false, name:"", role:"ADMIN" };
+  let selectedId = state.patients[0]?.id || null;
+  let tab = "fiche";
+
+  // DOM
+  const navBtns = [...document.querySelectorAll(".nav button[data-nav]")];
+  const pages = [...document.querySelectorAll("section[data-page]")];
+  const pageTitle = document.getElementById("pageTitle");
+  const pageSub = document.getElementById("pageSub");
+
+  const userName = document.getElementById("userName");
+  const userRole = document.getElementById("userRole");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const authInfo = document.getElementById("authInfo");
+
+  const q = document.getElementById("q");
+  const fStatus = document.getElementById("fStatus");
+  const fIAO = document.getElementById("fIAO");
+
+  const badgeQueue = document.getElementById("badgeQueue");
+  const countPill = document.getElementById("countPill");
+  const tblPatients = document.getElementById("tblPatients");
+  const selPill = document.getElementById("selPill");
+  const selSummary = document.getElementById("selSummary");
+  const btnGoPatient = document.getElementById("btnGoPatient");
+  const btnSetStatus = document.getElementById("btnSetStatus");
+  const btnClose = document.getElementById("btnClose");
+
+  const btnNew = document.getElementById("btnNew");
+  const btnExport = document.getElementById("btnExport");
+  const btnImport = document.getElementById("btnImport");
+  const btnReset = document.getElementById("btnReset");
+
+  const formAdmission = document.getElementById("formAdmission");
+  const btnClearAdm = document.getElementById("btnClearAdm");
+
+  const pNamePill = document.getElementById("pNamePill");
+  const pIdPill = document.getElementById("pIdPill");
+  const pStatusPill = document.getElementById("pStatusPill");
+  const pBanner = document.getElementById("pBanner");
+
+  const tabBtns = [...document.querySelectorAll("#tabs .tab")];
+  const subs = [...document.querySelectorAll(".subsection")];
+
+  // fiche fields
+  const pfNom = document.getElementById("pfNom");
+  const pfPrenom = document.getElementById("pfPrenom");
+  const pfDDN = document.getElementById("pfDDN");
+  const pfAge = document.getElementById("pfAge");
+  const pfSexe = document.getElementById("pfSexe");
+  const pfTel = document.getElementById("pfTel");
+  const pfAdresse = document.getElementById("pfAdresse");
+  const pfContact = document.getElementById("pfContact");
+  const pfMedecin = document.getElementById("pfMedecin");
+  const pfArrivee = document.getElementById("pfArrivee");
+  const pfMode = document.getElementById("pfMode");
+  const pfBox = document.getElementById("pfBox");
+  const pfMotif = document.getElementById("pfMotif");
+  const pfCommentaire = document.getElementById("pfCommentaire");
+  const pfATCDMed = document.getElementById("pfATCDMed");
+  const pfATCDChir = document.getElementById("pfATCDChir");
+  const pfAllergies = document.getElementById("pfAllergies");
+  const pfTTT = document.getElementById("pfTTT");
+  const btnSaveFiche = document.getElementById("btnSaveFiche");
+
+  const formIAO = document.getElementById("formIAO");
+  const iaoLast = document.getElementById("iaoLast");
+
+  const formConsult = document.getElementById("formConsult");
+  const consultLast = document.getElementById("consultLast");
+
+  const formSoins = document.getElementById("formSoins");
+  const soinsList = document.getElementById("soinsList");
+
+  const formExamens = document.getElementById("formExamens");
+  const examensList = document.getElementById("examensList");
+
+  const formSortie = document.getElementById("formSortie");
+  const sortieLast = document.getElementById("sortieLast");
+  const btnCloseCase = document.getElementById("btnCloseCase");
+
+  const crOut = document.getElementById("crOut");
+  const btnGenCR = document.getElementById("btnGenCR");
+  const btnCopyCR = document.getElementById("btnCopyCR");
+  const btnDlCR = document.getElementById("btnDlCR");
+
+  const auditCount = document.getElementById("auditCount");
+  const auditList = document.getElementById("auditList");
+
+  // modal
+  const modalBack = document.getElementById("modalBack");
+  const mTitle = document.getElementById("mTitle");
+  const mSub = document.getElementById("mSub");
+  const mBody = document.getElementById("mBody");
+  const mFooter = document.getElementById("mFooter");
+  const mClose = document.getElementById("mClose");
+
+  // wiring
+  navBtns.forEach(b=> b.addEventListener("click", ()=>setPage(b.dataset.nav)));
+  q.addEventListener("input", renderDashboard);
+  fStatus.addEventListener("change", renderDashboard);
+  fIAO.addEventListener("change", renderDashboard);
+
+  btnGoPatient.addEventListener("click", ()=>setPage("patient"));
+  btnNew.addEventListener("click", ()=>setPage("admission"));
+
+  btnSetStatus.addEventListener("click", modalStatus);
+  btnClose.addEventListener("click", ()=>closeCase(selectedId,true));
+
+  btnExport.addEventListener("click", exportAll);
+  btnImport.addEventListener("click", importAll);
+  btnReset.addEventListener("click", resetAll);
+
+  btnClearAdm.addEventListener("click", ()=>formAdmission.reset());
+  formAdmission.addEventListener("submit", onAdmission);
+
+  tabBtns.forEach(t=> t.addEventListener("click", ()=>setTab(t.dataset.tab)));
+  btnSaveFiche.addEventListener("click", saveFiche);
+
+  formIAO.addEventListener("submit", onIAO);
+  formConsult.addEventListener("submit", onConsult);
+  formSoins.addEventListener("submit", onSoins);
+  formExamens.addEventListener("submit", onExamens);
+  formSortie.addEventListener("submit", onSortie);
+  btnCloseCase.addEventListener("click", ()=>closeCase(selectedId,true));
+
+  btnGenCR.addEventListener("click", genCR);
+  btnCopyCR.addEventListener("click", copyCR);
+  btnDlCR.addEventListener("click", dlCR);
+
+  btnLogin.addEventListener("click", ()=>{
+    session.name = (userName.value||"").trim();
+    session.role = userRole.value;
+    session.open = !!session.name;
+    saveSession(session);
+    audit("SESSION_OPEN","",`Session: ${sessionLabel()}`);
+    applySessionUI();
+  });
+  btnLogout.addEventListener("click", ()=>{
+    audit("SESSION_CLOSE","",`Session fermée (${sessionLabel()||"—"})`);
+    session = {open:false,name:"",role:"ADMIN"};
+    saveSession(session);
+    applySessionUI();
+  });
+
+  mClose.addEventListener("click", closeModal);
+  modalBack.addEventListener("click",(e)=>{if(e.target===modalBack) closeModal();});
+  document.addEventListener("keydown",(e)=>{if(e.key==="Escape") closeModal();});
+
+  // init
+  applySessionUI();
+  setPage("dashboard");
+  renderAll();
+
+  function setPage(key){
+    navBtns.forEach(b=>b.classList.toggle("active",b.dataset.nav===key));
+    pages.forEach(p=>p.classList.toggle("show",p.dataset.page===key));
+    const map={
+      dashboard:["Tableau de bord","Suivi opérationnel (local)"],
+      admission:["Admission","Création du dossier"],
+      patient:["Dossier patient","Fiche + modules"],
+      audit:["Journal","Traçabilité locale"],
+      settings:["Paramètres","Local"]
+    };
+    const [t,s]=map[key]||["",""];
+    pageTitle.textContent=t; pageSub.textContent=s;
+    if(key==="dashboard") renderDashboard();
+    if(key==="patient") renderPatient();
+    if(key==="audit") renderAudit();
+  }
+
+  function setTab(k){
+    tab=k;
+    tabBtns.forEach(b=>b.classList.toggle("active", b.dataset.tab===k));
+    subs.forEach(s=>s.classList.toggle("show", s.dataset.sub===k));
+    renderPatient();
+  }
+
+  function applySessionUI(){
+    userName.value = session.name||"";
+    userRole.value = session.role||"ADMIN";
+    authInfo.textContent = session.open ? `Session active : ${sessionLabel()}` : "Aucune session ouverte.";
+  }
+  function requireSession(){
+    if(session.open) return true;
+    toast("Ouvre une session pour enregistrer.");
+    return false;
+  }
+
+  function onAdmission(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+
+    const d = Object.fromEntries(new FormData(formAdmission).entries());
+    const p = {
+      id: uid(),
+      createdAt: nowISO(),
+      status: "En attente",
+      // identity
+      nom: clean(d.nom), prenom: clean(d.prenom), ddn: clean(d.ddn), age: Number(d.age), sexe: d.sexe,
+      tel: clean(d.tel), adresse: clean(d.adresse), contact: clean(d.contact), medecin: clean(d.medecin),
+      // arrival
+      arrivalTime: clean(d.arrivalTime), box: clean(d.box), arrivalMode: clean(d.arrivalMode),
+      // context
+      motif: clean(d.motif), commentaire: clean(d.commentaire),
+      atcdMed: clean(d.atcdMed), atcdChir: clean(d.atcdChir), allergies: clean(d.allergies), traitements: clean(d.traitements),
+      iao: [], consult: [], soins: [], examens: [], sortie: []
+    };
+    state.patients.unshift(p);
+    selectedId = p.id;
+    audit("PATIENT_CREATE", p.id, `Admission: ${p.nom} ${p.prenom} (${p.age} ans) - ${p.motif}`);
+    saveState();
+    formAdmission.reset();
+    renderAll();
+    setPage("patient");
+  }
+
+  function saveFiche(){
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    p.nom = clean(pfNom.value); p.prenom = clean(pfPrenom.value); p.ddn = clean(pfDDN.value);
+    p.age = Number(pfAge.value||p.age); p.sexe = pfSexe.value;
+    p.tel = clean(pfTel.value); p.adresse = clean(pfAdresse.value);
+    p.contact = clean(pfContact.value); p.medecin = clean(pfMedecin.value);
+    p.arrivalTime = clean(pfArrivee.value); p.arrivalMode = clean(pfMode.value); p.box = clean(pfBox.value);
+    p.motif = clean(pfMotif.value); p.commentaire = clean(pfCommentaire.value);
+    p.atcdMed = clean(pfATCDMed.value); p.atcdChir = clean(pfATCDChir.value);
+    p.allergies = clean(pfAllergies.value); p.traitements = clean(pfTTT.value);
+    audit("PATIENT_UPDATE", p.id, "Mise à jour fiche");
+    saveState(); toast("Enregistré."); renderAll();
+  }
+
+  function onIAO(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    const d = Object.fromEntries(new FormData(formIAO).entries());
+    p.iao.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
+    if(p.status==="En attente") p.status="En cours";
+    audit("IAO_CREATE", p.id, `IAO ${d.level} - TA ${d.ta||"—"} FC ${d.fc||"—"} SpO2 ${d.spo2||"—"}`);
+    formIAO.reset(); saveState(); toast("IAO enregistrée."); renderAll();
+  }
+
+  function onConsult(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    const d = Object.fromEntries(new FormData(formConsult).entries());
+    p.consult.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
+    audit("CONSULT_CREATE", p.id, `Hypothèse: ${d.dx1||"—"}`);
+    formConsult.reset(); saveState(); toast("Consultation enregistrée."); renderAll();
+  }
+
+  function onSoins(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    const d = Object.fromEntries(new FormData(formSoins).entries());
+    p.soins.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
+    audit("SOINS_CREATE", p.id, `${d.type} - ${d.act||"—"}`);
+    formSoins.reset(); saveState(); toast("Soin tracé."); renderAll();
+  }
+
+  function onExamens(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    const d = Object.fromEntries(new FormData(formExamens).entries());
+    p.examens.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
+    audit("EXAMENS_CREATE", p.id, `${d.type} - ${d.conclu||"—"}`);
+    formExamens.reset(); saveState(); toast("Examen ajouté."); renderAll();
+  }
+
+  function onSortie(e){
+    e.preventDefault();
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    const d = Object.fromEntries(new FormData(formSortie).entries());
+    p.sortie.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
+    p.status = d.status || p.status;
+    audit("SORTIE_CREATE", p.id, `Orientation: ${d.orientation} Statut: ${p.status}`);
+    formSortie.reset(); saveState(); toast("Sortie enregistrée."); renderAll();
+  }
+
+  function closeCase(id, ask){
+    if(!requireSession()) return;
+    const p = state.patients.find(x=>x.id===id); if(!p) return;
+    if(ask && !confirm("Clôturer le dossier ? (statut Sortie)")) return;
+    p.status = "Sortie";
+    audit("CASE_CLOSE", p.id, "Clôture dossier");
+    saveState(); toast("Dossier clôturé."); renderAll();
+  }
+
+  function modalStatus(){
+    if(!requireSession()) return;
+    const p = getSel(); if(!p) return;
+    openModal("Changer statut","",`
+      <div class="field"><label>Statut</label>
+        <select id="st">
+          ${["En attente","En cours","Surveillance","Hospitalisé","Transfert","Sortie","Décédé"].map(s=>`<option ${p.status===s?"selected":""}>${s}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field" style="margin-top:10px"><label>Commentaire</label><textarea id="stc"></textarea></div>
+    `,[
+      {label:"Enregistrer",cls:"primary",onClick:()=>{
+        p.status = document.getElementById("st").value;
+        audit("PATIENT_STATUS", p.id, `Statut -> ${p.status}. ${clean(document.getElementById("stc").value)}`);
+        saveState(); closeModal(); renderAll();
+      }},
+      {label:"Annuler",cls:"",onClick:closeModal}
+    ]);
+  }
+
+  function genCR(){
+    const p = getSel(); if(!p) return;
+    const iao = p.iao.at(-1);
+    const md = p.consult.at(-1);
+    const out = [
+`HÔPITAL PUBLIQUE FRENCH CAPITAL`,
+`COMPTE RENDU DE PASSAGE AUX URGENCES`,
+"",
+`Identité : ${p.nom} ${p.prenom}`,
+`Date de naissance : ${p.ddn}  | Âge : ${p.age} ans | Sexe : ${p.sexe}`,
+`Adresse : ${p.adresse||"—"}  | Tel : ${p.tel||"—"}`,
+`Arrivée : ${p.arrivalTime||"—"} | Mode : ${p.arrivalMode||"—"} | Box : ${p.box||"—"}`,
+"",
+`ANTÉCÉDENTS / ALLERGIES / TRAITEMENTS`,
+`ATCD médicaux : ${p.atcdMed||"—"}`,
+`ATCD chirurgicaux : ${p.atcdChir||"—"}`,
+`Allergies : ${p.allergies||"—"}`,
+`Traitement habituel : ${p.traitements||"—"}`,
+"",
+`MOTIF DE CONSULTATION`,
+`${p.motif||"—"}`,
+`Commentaire d’entrée : ${p.commentaire||"—"}`,
+"",
+`CONSTANTES / IAO`,
+iao ? `Heure: ${iao.time||"—"} | IAO: ${iao.level||"—"} | EVA: ${iao.eva||"—"}\nTA: ${iao.ta||"—"} FC: ${iao.fc||"—"} FR: ${iao.fr||"—"} SpO2: ${iao.spo2||"—"} T°: ${iao.temp||"—"}\nActions IAO: ${iao.actions||"—"}\nCommentaire IAO: ${iao.comment||"—"}`
+    : `IAO non réalisée`,
+"",
+`CONSULTATION MÉDICALE`,
+md ? `Heure: ${md.time||"—"}\nHypothèse: ${md.dx1||"—"}\nDifférentiels: ${md.ddx||"—"}\n\nHMA:\n${md.hma||"—"}\n\nExamen:\n${md.exam||"—"}\n\nPlan:\n${md.plan||"—"}` : `Non renseignée`,
+"",
+`SOINS`,
+p.soins.length ? p.soins.map(s=>`- [${s.time||"—"}] ${s.type}: ${s.act||"—"} | ${s.details||""} (${s.author})`).join("\n") : `Aucun`,
+"",
+`EXAMENS`,
+p.examens.length ? p.examens.map(x=>`- [${x.time||"—"}] ${x.type}: ${x.conclu||"—"}\n  ${x.result||""} (${x.author})`).join("\n") : `Aucun`,
+"",
+`SORTIE / ORIENTATION`,
+p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"} | Orientation: ${s.orientation||"—"} | Statut: ${p.status}\nDiagnostic principal: ${s.dxMain||"—"}\nDiagnostics complémentaires: ${s.dxComp||"—"}\nConclusion: ${s.conclusion||"—"}\nConseils: ${s.advice||"—"}\nSignataire: ${s.author}`;})() : `Non renseignée`,
+"",
+`Généré le : ${new Date().toLocaleString("fr-FR")}`,
+`Signataire session : ${session.open ? sessionLabel() : "—"}`
+    ].join("\n");
+
+    crOut.textContent = out;
+    audit("CR_GENERATE", p.id, "Génération compte rendu");
+    saveState(); toast("CR généré.");
+  }
+
+  async function copyCR(){
+    const t = crOut.textContent||"";
+    if(!t || t.startsWith("Clique")) return toast("Rien à copier.");
+    try{ await navigator.clipboard.writeText(t); toast("Copié."); } catch { toast("Copie impossible."); }
+  }
+  function dlCR(){
+    const t = crOut.textContent||"";
+    if(!t || t.startsWith("Clique")) return toast("Rien à télécharger.");
+    const p = getSel();
+    const name = p ? `CR_${p.nom}_${p.prenom}_${p.id}.txt`.replace(/\s+/g,"_") : "CR.txt";
+    const blob = new Blob([t], {type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href=url; a.download=name; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderAll(){
+    renderDashboard(); renderPatient(); renderAudit();
+    saveState();
+  }
+
+  function renderDashboard(){
+    const list = filtered();
+    badgeQueue.textContent = String(list.length);
+    countPill.textContent = `${list.length} ${list.length>1?"patients":"patient"}`;
+    tblPatients.innerHTML = list.length ? list.map(p=>`
+      <tr data-id="${p.id}" style="cursor:pointer; ${p.id===selectedId?"background:rgba(78,163,255,.06)":""}">
+        <td class="mono">${esc(p.arrivalTime||"—")}</td>
+        <td><b>${esc(p.nom)} ${esc(p.prenom)}</b><div class="muted small">${esc(p.age)} ans • ${esc(p.sexe)}</div></td>
+        <td>${esc(p.motif||"—")}</td>
+        <td>${p.iao.at(-1)?.level ? `<span class="pill">${esc("IAO "+p.iao.at(-1).level)}</span>` : `<span class="pill">—</span>`}</td>
+        <td class="mono">${esc(p.box||"—")}</td>
+        <td>${pillStatus(p.status)}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="6" class="muted">Aucun patient.</td></tr>`;
+
+    [...tblPatients.querySelectorAll("tr[data-id]")].forEach(tr=>{
+      tr.addEventListener("click", ()=>{
+        selectedId = tr.dataset.id;
+        renderAll();
+      });
+    });
+
+    const p = getSel();
+    if(!p){
+      selPill.textContent="Aucun";
+      selSummary.textContent="Aucun patient sélectionné.";
+      return;
+    }
+    selPill.textContent = `${p.nom} ${p.prenom}`;
+    selSummary.innerHTML = `
+      <b>${esc(p.nom)} ${esc(p.prenom)}</b> — ${esc(p.age)} ans, ${esc(p.sexe)}<br/>
+      <span class="muted">ID :</span> <span class="mono">${esc(p.id)}</span><br/>
+      <span class="muted">Arrivée :</span> <span class="mono">${esc(p.arrivalTime||"—")}</span> •
+      <span class="muted">Box :</span> <span class="mono">${esc(p.box||"—")}</span><br/>
+      <span class="muted">Statut :</span> ${esc(p.status)}<br/>
+      <span class="muted">Motif :</span> ${esc(p.motif||"—")}
+    `;
+  }
+
+  function renderPatient(){
+    const p = getSel();
+    if(!p){
+      pNamePill.textContent="Aucun"; pIdPill.textContent="—"; pStatusPill.textContent="—";
+      pBanner.textContent="Sélectionne un patient depuis le tableau de bord.";
+      return;
+    }
+    pNamePill.textContent = `${p.nom} ${p.prenom}`;
+    pIdPill.textContent = p.id;
+    pStatusPill.innerHTML = pillStatus(p.status);
+    pBanner.innerHTML = `<b>${esc(p.nom)} ${esc(p.prenom)}</b> — ${esc(p.age)} ans, ${esc(p.sexe)} • <span class="muted">Motif :</span> ${esc(p.motif||"—")}`;
+
+    // fill fiche
+    pfNom.value=p.nom||""; pfPrenom.value=p.prenom||""; pfDDN.value=p.ddn||"";
+    pfAge.value=p.age??""; pfSexe.value=p.sexe||"H"; pfTel.value=p.tel||"";
+    pfAdresse.value=p.adresse||""; pfContact.value=p.contact||""; pfMedecin.value=p.medecin||"";
+    pfArrivee.value=p.arrivalTime||""; pfMode.value=p.arrivalMode||""; pfBox.value=p.box||"";
+    pfMotif.value=p.motif||""; pfCommentaire.value=p.commentaire||"";
+    pfATCDMed.value=p.atcdMed||""; pfATCDChir.value=p.atcdChir||"";
+    pfAllergies.value=p.allergies||""; pfTTT.value=p.traitements||"";
+
+    const iao=p.iao.at(-1);
+    iaoLast.innerHTML = iao ? `<b>Dernière IAO</b> [${esc(iao.time||"—")}] • IAO ${esc(iao.level||"—")} • EVA ${esc(iao.eva||"—")}<br/>
+      TA ${esc(iao.ta||"—")} • FC ${esc(iao.fc||"—")} • FR ${esc(iao.fr||"—")} • SpO₂ ${esc(iao.spo2||"—")} • T° ${esc(iao.temp||"—")}<br/>
+      <span class="muted">Actions :</span> ${esc(iao.actions||"—")}<br/>
+      <span class="muted">Commentaire :</span> ${esc(iao.comment||"—")}` : "Aucune IAO enregistrée.";
+
+    const md=p.consult.at(-1);
+    consultLast.innerHTML = md ? `<b>Dernière consultation</b> [${esc(md.time||"—")}]<br/>
+      <span class="muted">Hypothèse :</span> ${esc(md.dx1||"—")}<br/>
+      <span class="muted">Différentiels :</span> ${esc(md.ddx||"—")}` : "Aucune consultation enregistrée.";
+
+    soinsList.innerHTML = p.soins.length ? p.soins.slice().reverse().map(s=>`• [${esc(s.time||"—")}] ${esc(s.type)} : <b>${esc(s.act||"—")}</b> — ${esc(s.details||"")} <span class="muted">(${esc(s.author)})</span>`).join("<br/>") : "Aucun soin.";
+    examensList.innerHTML = p.examens.length ? p.examens.slice().reverse().map(x=>`• [${esc(x.time||"—")}] <b>${esc(x.type)}</b> : ${esc(x.conclu||"—")}<br/><span class="muted">${esc(x.result||"")}</span> <span class="muted">(${esc(x.author)})</span>`).join("<div class='sep'></div>") : "Aucun examen.";
+
+    const s=p.sortie.at(-1);
+    sortieLast.innerHTML = s ? `<b>Dernière sortie</b> [${esc(s.time||"—")}] — ${esc(s.orientation||"—")} • Statut: ${esc(p.status)}<br/>
+      <span class="muted">Dx principal :</span> ${esc(s.dxMain||"—")}` : "Aucune sortie enregistrée.";
+  }
+
+  function renderAudit(){
+    auditCount.textContent = String(state.audit.length);
+    auditList.innerHTML = state.audit.length ? state.audit.slice(0,80).map(a=>`• <span class="mono">${esc(a.time)}</span> — <b>${esc(a.action)}</b> — <span class="mono">${esc(a.patientId||"—")}</span> — ${esc(a.details||"—")} <span class="muted">(${esc(a.actor)})</span>`).join("<br/>") : "Aucun événement.";
+  }
+
+  function filtered(){
+    const text=(q.value||"").trim().toLowerCase();
+    const st=fStatus.value;
+    const ia=fIAO.value;
+    return state.patients.filter(p=>{
+      if(st && p.status!==st) return false;
+      if(ia){
+        const lvl=p.iao.at(-1)?.level;
+        if(!lvl || String(lvl)!==String(ia)) return false;
+      }
+      if(!text) return true;
+      const hay = `${p.id} ${p.nom} ${p.prenom} ${p.motif} ${p.commentaire}`.toLowerCase();
+      return hay.includes(text);
+    }).sort((a,b)=>(a.arrivalTime||"").localeCompare(b.arrivalTime||""));
+  }
+
+  // export/import/reset
+  function exportAll(){
+    if(!requireSession()) return;
+    const blob = new Blob([JSON.stringify({state,session},null,2)], {type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=`hpfc_export_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    URL.revokeObjectURL(url);
+    audit("EXPORT","", "Export données");
+    renderAudit();
+  }
+  function importAll(){
+    if(!requireSession()) return;
+    openModal("Importer","Colle un JSON exporté",`
+      <div class="field"><label>JSON</label><textarea id="imp" style="min-height:220px"></textarea></div>
+    `,[
+      {label:"Importer",cls:"warn",onClick:()=>{
+        try{
+          const obj=JSON.parse(document.getElementById("imp").value||"");
+          if(obj?.state?.patients){
+            state.patients=obj.state.patients;
+            state.audit=obj.state.audit||[];
+            session=obj.session||session;
+            selectedId=state.patients[0]?.id||null;
+            saveState(); saveSession(session); applySessionUI();
+            audit("IMPORT","", "Import données");
+            closeModal(); renderAll(); toast("Import OK.");
+          } else toast("JSON invalide.");
+        }catch{toast("Erreur JSON.");}
+      }},
+      {label:"Annuler",cls:"",onClick:closeModal}
+    ]);
+  }
+  function resetAll(){
+    if(!requireSession()) return;
+    if(!confirm("Tout effacer ?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state.patients=[]; state.audit=[];
+    selectedId=null;
+    saveState();
+    audit("RESET","", "Réinitialisation");
+    renderAll();
+  }
+
+  // helpers
+  function audit(action, patientId, details){
+    state.audit.unshift({time: nowISO(), actor: session.open?sessionLabel():"unknown", action, patientId: patientId||"", details: details||""});
+    if(state.audit.length>2000) state.audit.length=2000;
+    saveState();
+  }
+  function getSel(){ return state.patients.find(p=>p.id===selectedId) || null; }
+  function uid(){ return (crypto?.randomUUID?.() || ("id-"+Math.random().toString(16).slice(2))); }
+  function nowISO(){ return new Date().toISOString(); }
+  function clean(s){ return String(s??"").trim(); }
+  function esc(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+  function sessionLabel(){ return `${session.name} (${session.role})`; }
+  function pillStatus(st){
+    const cls = st==="Sortie" ? "ok" : (st==="Décédé" ? "danger" : (st==="En attente" ? "warn" : "info"));
+    return `<span class="pill ${cls}">${esc(st||"—")}</span>`;
+  }
+  function toast(msg){
+    const el=document.createElement("div");
+    el.textContent=msg;
+    Object.assign(el.style,{
+      position:"fixed",right:"16px",bottom:"16px",padding:"10px 12px",borderRadius:"14px",
+      border:"1px solid rgba(255,255,255,.16)",background:"rgba(10,20,42,.92)",color:"var(--text)",
+      boxShadow:"0 12px 30px rgba(0,0,0,.35)",zIndex:"2000",maxWidth:"min(420px, 92vw)"
+    });
+    document.body.appendChild(el);
+    setTimeout(()=>{el.style.opacity="0";el.style.transition="opacity .25s ease";},1700);
+    setTimeout(()=>el.remove(),2000);
+  }
+
+  // modal
+  function openModal(title, sub, body, buttons){
+    mTitle.textContent=title; mSub.textContent=sub||"";
+    mBody.innerHTML=body||""; mFooter.innerHTML="";
+    (buttons||[{label:"Fermer",cls:"",onClick:closeModal}]).forEach(b=>{
+      const btn=document.createElement("button");
+      btn.className="btn "+(b.cls||""); btn.textContent=b.label;
+      btn.addEventListener("click", b.onClick);
+      mFooter.appendChild(btn);
+    });
+    modalBack.classList.add("show"); modalBack.setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    modalBack.classList.remove("show"); modalBack.setAttribute("aria-hidden","true");
+    mBody.innerHTML=""; mFooter.innerHTML="";
+  }
+
+  function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function loadState(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY));}catch{return null;} }
+  function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function loadSession(){ try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch{return null;} }
+</script>
+</body>
+</html>

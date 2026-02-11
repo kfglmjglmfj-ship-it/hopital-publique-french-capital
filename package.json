@@ -1,7 +1,8 @@
 {
-  "name": "hpfc",
-  "private": true,
+  "name": "hopital-public-french-capital",
+  "version": "1.0.0",
+  "type": "module",
   "dependencies": {
-    "@netlify/neon": "^1.0.0"
+    "@netlify/neon": "^0.4.1"
   }
 }

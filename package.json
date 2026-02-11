@@ -1,0 +1,7 @@
+{
+  "name": "hpfc",
+  "private": true,
+  "dependencies": {
+    "@netlify/neon": "^0.3.0"
+  }
+}

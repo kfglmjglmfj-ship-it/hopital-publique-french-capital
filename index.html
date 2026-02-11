@@ -723,9 +723,13 @@ let selectedId = null;
   document.addEventListener("keydown",(e)=>{if(e.key==="Escape") closeModal();});
 
   // init
+(async ()=>{
+  await loadState();               // charge DB + cache
+  selectedId = state.patients[0]?.id || null;
   applySessionUI();
   setPage("dashboard");
   renderAll();
+})();
 
   function setPage(key){
     navBtns.forEach(b=>b.classList.toggle("active",b.dataset.nav===key));
@@ -784,7 +788,7 @@ let selectedId = null;
     state.patients.unshift(p);
     selectedId = p.id;
     audit("PATIENT_CREATE", p.id, `Admission: ${p.nom} ${p.prenom} (${p.age} ans) - ${p.motif}`);
-    saveState();
+    saveStateDebounced();
     formAdmission.reset();
     renderAll();
     setPage("patient");
@@ -802,7 +806,7 @@ let selectedId = null;
     p.atcdMed = clean(pfATCDMed.value); p.atcdChir = clean(pfATCDChir.value);
     p.allergies = clean(pfAllergies.value); p.traitements = clean(pfTTT.value);
     audit("PATIENT_UPDATE", p.id, "Mise à jour fiche");
-    saveState(); toast("Enregistré."); renderAll();
+    saveStateDebounced(); toast("Enregistré."); renderAll();
   }
 
   function onIAO(e){
@@ -813,7 +817,7 @@ let selectedId = null;
     p.iao.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
     if(p.status==="En attente") p.status="En cours";
     audit("IAO_CREATE", p.id, `IAO ${d.level} - TA ${d.ta||"—"} FC ${d.fc||"—"} SpO2 ${d.spo2||"—"}`);
-    formIAO.reset(); saveState(); toast("IAO enregistrée."); renderAll();
+    formIAO.reset(); saveStateDebounced(); toast("IAO enregistrée."); renderAll();
   }
 
   function onConsult(e){
@@ -823,7 +827,7 @@ let selectedId = null;
     const d = Object.fromEntries(new FormData(formConsult).entries());
     p.consult.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
     audit("CONSULT_CREATE", p.id, `Hypothèse: ${d.dx1||"—"}`);
-    formConsult.reset(); saveState(); toast("Consultation enregistrée."); renderAll();
+    formConsult.reset(); saveStateDebounced(); toast("Consultation enregistrée."); renderAll();
   }
 
   function onSoins(e){
@@ -833,7 +837,7 @@ let selectedId = null;
     const d = Object.fromEntries(new FormData(formSoins).entries());
     p.soins.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
     audit("SOINS_CREATE", p.id, `${d.type} - ${d.act||"—"}`);
-    formSoins.reset(); saveState(); toast("Soin tracé."); renderAll();
+    formSoins.reset(); saveStateDebounced(); toast("Soin tracé."); renderAll();
   }
 
   function onExamens(e){
@@ -843,7 +847,7 @@ let selectedId = null;
     const d = Object.fromEntries(new FormData(formExamens).entries());
     p.examens.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
     audit("EXAMENS_CREATE", p.id, `${d.type} - ${d.conclu||"—"}`);
-    formExamens.reset(); saveState(); toast("Examen ajouté."); renderAll();
+    formExamens.reset(); saveStateDebounced(); toast("Examen ajouté."); renderAll();
   }
 
   function onSortie(e){
@@ -854,7 +858,7 @@ let selectedId = null;
     p.sortie.push({ ...d, author: sessionLabel(), createdAt: nowISO() });
     p.status = d.status || p.status;
     audit("SORTIE_CREATE", p.id, `Orientation: ${d.orientation} Statut: ${p.status}`);
-    formSortie.reset(); saveState(); toast("Sortie enregistrée."); renderAll();
+    formSortie.reset(); saveStateDebounced(); toast("Sortie enregistrée."); renderAll();
   }
 
   function closeCase(id, ask){
@@ -863,7 +867,7 @@ let selectedId = null;
     if(ask && !confirm("Clôturer le dossier ? (statut Sortie)")) return;
     p.status = "Sortie";
     audit("CASE_CLOSE", p.id, "Clôture dossier");
-    saveState(); toast("Dossier clôturé."); renderAll();
+    saveStateDebounced(); toast("Dossier clôturé."); renderAll();
   }
 
   function modalStatus(){
@@ -880,7 +884,7 @@ let selectedId = null;
       {label:"Enregistrer",cls:"primary",onClick:()=>{
         p.status = document.getElementById("st").value;
         audit("PATIENT_STATUS", p.id, `Statut -> ${p.status}. ${clean(document.getElementById("stc").value)}`);
-        saveState(); closeModal(); renderAll();
+        saveStateDebounced(); closeModal(); renderAll();
       }},
       {label:"Annuler",cls:"",onClick:closeModal}
     ]);
@@ -931,7 +935,7 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
 
     crOut.textContent = out;
     audit("CR_GENERATE", p.id, "Génération compte rendu");
-    saveState(); toast("CR généré.");
+    saveStateDebounced(); toast("CR généré.");
   }
 
   async function copyCR(){
@@ -953,7 +957,7 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
 
   function renderAll(){
     renderDashboard(); renderPatient(); renderAudit();
-    saveState();
+    saveStateDebounced();
   }
 
   function renderDashboard(){
@@ -1080,7 +1084,7 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
             state.audit=obj.state.audit||[];
             session=obj.session||session;
             selectedId=state.patients[0]?.id||null;
-            saveState(); saveSession(session); applySessionUI();
+            saveStateDebounced(); saveSession(session); applySessionUI();
             audit("IMPORT","", "Import données");
             closeModal(); renderAll(); toast("Import OK.");
           } else toast("JSON invalide.");
@@ -1095,7 +1099,7 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
     localStorage.removeItem(STORAGE_KEY);
     state.patients=[]; state.audit=[];
     selectedId=null;
-    saveState();
+    saveStateDebounced();
     audit("RESET","", "Réinitialisation");
     renderAll();
   }
@@ -1104,7 +1108,7 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
   function audit(action, patientId, details){
     state.audit.unshift({time: nowISO(), actor: session.open?sessionLabel():"unknown", action, patientId: patientId||"", details: details||""});
     if(state.audit.length>2000) state.audit.length=2000;
-    saveState();
+    saveStateDebounced();
   }
   function getSel(){ return state.patients.find(p=>p.id===selectedId) || null; }
   function uid(){ return (crypto?.randomUUID?.() || ("id-"+Math.random().toString(16).slice(2))); }
@@ -1146,8 +1150,46 @@ p.sortie.length ? (()=>{const s=p.sortie.at(-1); return `Heure: ${s.time||"—"}
     mBody.innerHTML=""; mFooter.innerHTML="";
   }
 
-  function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  function loadState(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY));}catch{return null;} }
+  function saveStateLocal(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadStateLocal(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch{ return null; }
+}
+
+// charge depuis DB (et garde un cache local si jamais DB down)
+async function loadState(){
+  const cached = loadStateLocal();
+  if(cached) state = cached;
+
+  try{
+    const r = await fetch("/api/state", { method:"GET" });
+    if(!r.ok) throw new Error("GET failed");
+    const data = await r.json();
+    if(data?.state){
+      state = data.state;
+      saveStateLocal();
+    }
+  }catch(e){
+    // DB pas dispo -> on garde le local
+  }
+}
+
+// enregistre local + envoie à la DB (avec délai pour éviter spam)
+let _saveTimer = null;
+function saveStateDebounced(){
+  saveStateLocal();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async ()=>{
+    try{
+      await fetch("/api/state",{
+        method:"POST",
+        headers:{ "content-type":"application/json" },
+        body: JSON.stringify({ state })
+      });
+    }catch(e){}
+  }, 400);
+}
   function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
   function loadSession(){ try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch{return null;} }
 </script>

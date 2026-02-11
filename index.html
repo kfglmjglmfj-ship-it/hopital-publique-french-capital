@@ -570,12 +570,11 @@
 
 <script>
   const STORAGE_KEY = "hpfc_html_only_v1";
-  const SESSION_KEY = "hpfc_html_session_v1";
+const SESSION_KEY = "hpfc_html_session_v1";
 
-  const state = loadState() || { patients: [], audit: [] };
-  let session = loadSession() || { open:false, name:"", role:"ADMIN" };
-  let selectedId = state.patients[0]?.id || null;
-  let tab = "fiche";
+let state = { patients: [], audit: [] }; // IMPORTANT: let
+let session = loadSession() || { open:false, name:"", role:"ADMIN" };
+let selectedId = null;
 
   // DOM
   const navBtns = [...document.querySelectorAll(".nav button[data-nav]")];
